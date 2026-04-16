@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pasajeros — AeroGest</title>
+  <meta name="description" content="Gestiona el registro de pasajeros del aeropuerto: datos personales, documentos y búsqueda rápida." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { font-family:'Inter',sans-serif; }
+    @keyframes slide-in { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fade-in  { from{opacity:0} to{opacity:1} }
+    .animate-slide-in{animation:slide-in .35s ease-out both}
+    .animate-fade-in {animation:fade-in  .3s  ease-out both}
+    .sidebar-link.active{background:rgba(56,189,248,.12);color:#38bdf8;border-left:3px solid #38bdf8}
+    ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:#0f172a} ::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+    .modal-overlay{backdrop-filter:blur(4px)}
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="w-64 min-h-screen bg-slate-900 border-r border-slate-800 flex flex-col fixed left-0 top-0 z-30">
+    <div class="px-6 py-5 border-b border-slate-800">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-sky-500 rounded-xl flex items-center justify-center text-xl shadow-lg shadow-sky-500/30">✈️</div>
+        <div><h1 class="text-white font-bold text-lg leading-none">AeroGest</h1><p class="text-slate-400 text-xs">Gestión de Vuelos</p></div>
+      </div>
+    </div>
+    <nav class="flex-1 px-3 py-4 space-y-1">
+      <a href="index.html"     class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 transition-all hover:bg-slate-800 hover:text-slate-100"><span class="text-lg">🏠</span> Dashboard</a>
+      <a href="vuelos.html"    class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 transition-all hover:bg-slate-800 hover:text-slate-100"><span class="text-lg">🛫</span> Vuelos</a>
+      <a href="pasajeros.html" class="sidebar-link active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all hover:bg-slate-800"><span class="text-lg">👥</span> Pasajeros</a>
+      <a href="reservas.html"  class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 transition-all hover:bg-slate-800 hover:text-slate-100"><span class="text-lg">🎫</span> Reservas</a>
+    </nav>
+    <div class="px-4 py-4 border-t border-slate-800">
+      <div id="api-status" class="flex items-center gap-2 text-xs text-slate-400">
+        <span class="w-2 h-2 bg-slate-600 rounded-full animate-pulse"></span> Conectando...
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══ MAIN ═══ -->
+  <main class="ml-64 flex-1 p-8">
+    <div class="mb-6 flex items-center justify-between animate-fade-in">
+      <div>
+        <h2 class="text-3xl font-bold text-white">Gestión de <span class="text-sky-400">Pasajeros</span></h2>
+        <p class="text-slate-400 text-sm mt-1">Registro y consulta de pasajeros</p>
+      </div>
+      <button onclick="abrirModal()"
+        class="flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-white font-semibold px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-sky-500/25 active:scale-95">
+        <span>+</span> Nuevo Pasajero
+      </button>
+    </div>
+
+    <!-- Buscador -->
+    <div class="mb-6 animate-slide-in">
+      <div class="relative max-w-md">
+        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">🔍</span>
+        <input id="buscador" type="text" placeholder="Buscar por nombre, documento o email..."
+          oninput="buscarPasajero(this.value)"
+          class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-11 pr-4 py-2.5 text-white text-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all" />
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden animate-slide-in" style="animation-delay:.1s">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-slate-800 text-slate-500 text-xs uppercase tracking-wide">
+              <th class="px-6 py-4 text-left">Pasajero</th>
+              <th class="px-6 py-4 text-left">Documento</th>
+              <th class="px-6 py-4 text-left">Email</th>
+              <th class="px-6 py-4 text-left">Teléfono</th>
+              <th class="px-6 py-4 text-left">Nacionalidad</th>
+              <th class="px-6 py-4 text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-pasajeros">
+            <tr><td colspan="6" class="px-6 py-12 text-center text-slate-500">Cargando pasajeros...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="tabla-footer" class="px-6 py-3 border-t border-slate-800 text-slate-500 text-xs"></div>
+    </div>
+  </main>
+
+  <!-- ═══ MODAL ═══ -->
+  <div id="modal" class="hidden fixed inset-0 z-50 modal-overlay bg-slate-950/80 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-xl shadow-2xl animate-slide-in">
+      <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+        <h3 id="modal-title" class="text-lg font-semibold text-white">Nuevo Pasajero</h3>
+        <button onclick="cerrarModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+      </div>
+      <form id="form-pasajero" class="p-6 grid grid-cols-2 gap-4">
+        <input type="hidden" id="pasajero-id" />
+        <div>
+          <label class="block text-slate-400 text-xs mb-1.5 font-medium">Nombre *</label>
+          <input id="f-nombre" type="text" placeholder="Carlos" required
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-sky-500 transition-all" />
+        </div>
+        <div>
+          <label class="block text-slate-400 text-xs mb-1.5 font-medium">Apellido *</label>
+          <input id="f-apellido" type="text" placeholder="Rodríguez" required
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-sky-500 transition-all" />
+        </div>
+        <div>
+          <label class="block text-slate-400 text-xs mb-1.5 font-medium">Tipo Documento</label>
+          <select id="f-tipo-doc"
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-sky-500 transition-all">
+            <option value="cedula">Cédula</option>
+            <option value="pasaporte">Pasaporte</option>
+            <option value="tarjeta_id">Tarjeta de Identidad</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-slate-400 text-xs mb-1.5 font-medium">Número Documento *</label>
+          <input id="f-documento" type="text" placeholder="1020304050" required
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-sky-500 transition-all" />
+        </div>
+        <div class="col-span-2">
+          <label class="block text-slate-400 text-xs mb-1.5 font-medium">Email *</label>
+          <input id="f-email" type="email" placeholder="correo@email.com" required
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-sky-500 transition-all" />
+        </div>
+        <div>
+          <label class="block text-slate-400 text-xs mb-1.5 font-medium">Teléfono</label>
+          <input id="f-telefono" type="text" placeholder="3001234567"
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-sky-500 transition-all" />
+        </div>
+        <div>
+          <label class="block text-slate-400 text-xs mb-1.5 font-medium">Nacionalidad</label>
+          <input id="f-nacionalidad" type="text" placeholder="Colombia"
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-sky-500 transition-all" />
+        </div>
+      </form>
+      <div class="px-6 pb-6 flex items-center justify-end gap-3">
+        <button onclick="cerrarModal()" class="px-5 py-2.5 rounded-xl text-slate-400 hover:text-white text-sm font-medium transition-all hover:bg-slate-800">Cancelar</button>
+        <button onclick="guardarPasajero()" class="px-6 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-sm font-semibold transition-all shadow-lg shadow-sky-500/25 active:scale-95">
+          💾 Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="global-loader" class="hidden fixed inset-0 bg-slate-950/70 z-50 flex items-center justify-center backdrop-blur-sm">
+    <div class="w-12 h-12 border-4 border-sky-500 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/pasajeros.js"></script>
+</body>
+</html>

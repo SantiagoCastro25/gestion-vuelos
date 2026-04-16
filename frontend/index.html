@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AeroGest — Sistema de Gestión de Vuelos</title>
+  <meta name="description" content="Plataforma de gestión de vuelos para aeropuerto. Controla vuelos, pasajeros, reservas y tripulación en tiempo real." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    @keyframes slide-in { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fade-in  { from { opacity:0; } to { opacity:1; } }
+    @keyframes pulse-glow { 0%,100% { box-shadow:0 0 0 0 rgba(56,189,248,0.4); } 50% { box-shadow:0 0 0 8px rgba(56,189,248,0); } }
+    .animate-slide-in { animation: slide-in 0.35s ease-out both; }
+    .animate-fade-in  { animation: fade-in  0.5s ease-out both; }
+    .card-glow:hover  { box-shadow: 0 0 24px rgba(56,189,248,0.15); }
+    .sidebar-link.active { background: rgba(56,189,248,0.12); color: #38bdf8; border-left: 3px solid #38bdf8; }
+    ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:#0f172a; } ::-webkit-scrollbar-thumb { background:#334155; border-radius:3px; }
+    .flight-card { transition: transform .2s, box-shadow .2s; }
+    .flight-card:hover { transform: translateY(-3px); box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+    .stat-card { background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%); }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex">
+
+  <!-- ═══════════════ SIDEBAR ═══════════════ -->
+  <aside class="w-64 min-h-screen bg-slate-900 border-r border-slate-800 flex flex-col fixed left-0 top-0 z-30">
+    <!-- Logo -->
+    <div class="px-6 py-5 border-b border-slate-800">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-sky-500 rounded-xl flex items-center justify-center text-xl shadow-lg shadow-sky-500/30">✈️</div>
+        <div>
+          <h1 class="text-white font-bold text-lg leading-none">AeroGest</h1>
+          <p class="text-slate-400 text-xs">Gestión de Vuelos</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navegación -->
+    <nav class="flex-1 px-3 py-4 space-y-1">
+      <a href="index.html"      class="sidebar-link active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all hover:bg-slate-800">
+        <span class="text-lg">🏠</span> Dashboard
+      </a>
+      <a href="vuelos.html"     class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 transition-all hover:bg-slate-800 hover:text-slate-100">
+        <span class="text-lg">🛫</span> Vuelos
+      </a>
+      <a href="pasajeros.html"  class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 transition-all hover:bg-slate-800 hover:text-slate-100">
+        <span class="text-lg">👥</span> Pasajeros
+      </a>
+      <a href="reservas.html"   class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 transition-all hover:bg-slate-800 hover:text-slate-100">
+        <span class="text-lg">🎫</span> Reservas
+      </a>
+    </nav>
+
+    <!-- Estado API -->
+    <div class="px-4 py-4 border-t border-slate-800">
+      <div id="api-status" class="flex items-center gap-2 text-xs text-slate-400">
+        <span class="w-2 h-2 bg-slate-600 rounded-full animate-pulse"></span>
+        Conectando...
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════════ CONTENIDO ═══════════════ -->
+  <main class="ml-64 flex-1 p-8">
+
+    <!-- Encabezado -->
+    <div class="mb-8 animate-fade-in">
+      <h2 class="text-3xl font-bold text-white">Dashboard <span class="text-sky-400">General</span></h2>
+      <p class="text-slate-400 mt-1" id="fecha-hoy"></p>
+    </div>
+
+    <!-- ── Tarjetas de estadísticas ── -->
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
+      <div class="stat-card card-glow border border-slate-800 rounded-2xl p-5 animate-slide-in" style="animation-delay:.05s">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-slate-400 text-sm font-medium">Vuelos Hoy</span>
+          <div class="w-10 h-10 bg-sky-500/15 rounded-xl flex items-center justify-center text-xl">🛫</div>
+        </div>
+        <p class="text-3xl font-bold text-white" id="stat-total">—</p>
+        <p class="text-slate-500 text-xs mt-1">Total en sistema</p>
+      </div>
+
+      <div class="stat-card card-glow border border-slate-800 rounded-2xl p-5 animate-slide-in" style="animation-delay:.10s">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-slate-400 text-sm font-medium">En Vuelo</span>
+          <div class="w-10 h-10 bg-violet-500/15 rounded-xl flex items-center justify-center text-xl">🌐</div>
+        </div>
+        <p class="text-3xl font-bold text-violet-400" id="stat-en-vuelo">—</p>
+        <p class="text-slate-500 text-xs mt-1">Actualmente volando</p>
+      </div>
+
+      <div class="stat-card card-glow border border-slate-800 rounded-2xl p-5 animate-slide-in" style="animation-delay:.15s">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-slate-400 text-sm font-medium">Embarcando</span>
+          <div class="w-10 h-10 bg-amber-500/15 rounded-xl flex items-center justify-center text-xl">🚪</div>
+        </div>
+        <p class="text-3xl font-bold text-amber-400" id="stat-embarcando">—</p>
+        <p class="text-slate-500 text-xs mt-1">En sala de embarque</p>
+      </div>
+
+      <div class="stat-card card-glow border border-slate-800 rounded-2xl p-5 animate-slide-in" style="animation-delay:.20s">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-slate-400 text-sm font-medium">Cancelados</span>
+          <div class="w-10 h-10 bg-red-500/15 rounded-xl flex items-center justify-center text-xl">❌</div>
+        </div>
+        <p class="text-3xl font-bold text-red-400" id="stat-cancelados">—</p>
+        <p class="text-slate-500 text-xs mt-1">Vuelos cancelados</p>
+      </div>
+    </div>
+
+    <!-- Fila inferior: Vuelos próximos + Reservas -->
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+      <!-- ── Tabla de vuelos próximos ── -->
+      <div class="xl:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden animate-slide-in" style="animation-delay:.25s">
+        <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+          <h3 class="font-semibold text-white">Vuelos Próximos</h3>
+          <a href="vuelos.html" class="text-sky-400 text-sm hover:text-sky-300 font-medium">Ver todos →</a>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-slate-800 text-slate-500 text-xs uppercase tracking-wide">
+                <th class="px-6 py-3 text-left">Vuelo</th>
+                <th class="px-6 py-3 text-left">Ruta</th>
+                <th class="px-6 py-3 text-left">Salida</th>
+                <th class="px-6 py-3 text-left">Estado</th>
+                <th class="px-6 py-3 text-right">Asientos</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-vuelos-recientes">
+              <tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">Cargando vuelos...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── Resumen de reservas ── -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden animate-slide-in" style="animation-delay:.30s">
+        <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+          <h3 class="font-semibold text-white">Reservas</h3>
+          <a href="reservas.html" class="text-sky-400 text-sm hover:text-sky-300 font-medium">Ver todas →</a>
+        </div>
+        <div class="p-6 space-y-4">
+          <div class="flex items-center justify-between p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
+            <span class="text-emerald-300 text-sm font-medium">✅ Confirmadas</span>
+            <span class="text-emerald-400 font-bold text-xl" id="res-confirmadas">—</span>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-fuchsia-500/10 border border-fuchsia-500/20 rounded-xl">
+            <span class="text-fuchsia-300 text-sm font-medium">🎉 Completadas</span>
+            <span class="text-fuchsia-400 font-bold text-xl" id="res-completadas">—</span>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+            <span class="text-amber-300 text-sm font-medium">⏳ Pendientes</span>
+            <span class="text-amber-400 font-bold text-xl" id="res-pendientes">—</span>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+            <span class="text-red-300 text-sm font-medium">❌ Canceladas</span>
+            <span class="text-red-400 font-bold text-xl" id="res-canceladas">—</span>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-slate-800 border border-slate-700 rounded-xl">
+            <span class="text-slate-300 text-sm font-medium">📊 Total</span>
+            <span class="text-white font-bold text-xl" id="res-total">—</span>
+          </div>
+        </div>
+
+        <!-- Vuelos por estado (mini barras) -->
+        <div class="px-6 pb-6">
+          <p class="text-slate-500 text-xs uppercase tracking-wide mb-3">Estado de vuelos</p>
+          <div class="space-y-2.5">
+            <div>
+              <div class="flex justify-between text-xs mb-1"><span class="text-sky-300">Programados</span><span id="bar-programado-label" class="text-slate-400">0</span></div>
+              <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden"><div id="bar-programado" class="h-full bg-sky-500 rounded-full transition-all duration-700" style="width:0%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs mb-1"><span class="text-violet-300">En Vuelo</span><span id="bar-en-vuelo-label" class="text-slate-400">0</span></div>
+              <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden"><div id="bar-en-vuelo" class="h-full bg-violet-500 rounded-full transition-all duration-700" style="width:0%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs mb-1"><span class="text-emerald-300">Aterrizados</span><span id="bar-aterrizado-label" class="text-slate-400">0</span></div>
+              <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden"><div id="bar-aterrizado" class="h-full bg-emerald-500 rounded-full transition-all duration-700" style="width:0%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Loader global -->
+  <div id="global-loader" class="hidden fixed inset-0 bg-slate-950/70 z-50 flex items-center justify-center backdrop-blur-sm">
+    <div class="flex flex-col items-center gap-4">
+      <div class="w-12 h-12 border-4 border-sky-500 border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-slate-300 text-sm">Cargando datos...</p>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script>
+    // ── Fecha actual ───────────────────────────────────────────
+    document.getElementById("fecha-hoy").textContent =
+      new Date().toLocaleDateString("es-CO", { weekday:"long", year:"numeric", month:"long", day:"numeric" });
+
+    // ── Estado de la API ───────────────────────────────────────
+    async function checkApiStatus() {
+      const el = document.getElementById("api-status");
+      try {
+        await fetch("http://localhost:5000/api/health");
+        el.innerHTML = `<span class="w-2 h-2 bg-emerald-400 rounded-full"></span> API conectada`;
+        el.className = "flex items-center gap-2 text-xs text-emerald-400";
+      } catch {
+        el.innerHTML = `<span class="w-2 h-2 bg-red-400 rounded-full animate-pulse"></span> API desconectada`;
+        el.className = "flex items-center gap-2 text-xs text-red-400";
+      }
+    }
+
+    // ── Cargar estadísticas de vuelos ─────────────────────────
+    async function cargarEstadisticas() {
+      try {
+        const stats = await VuelosAPI.estadisticas();
+        document.getElementById("stat-total").textContent      = stats.total;
+        document.getElementById("stat-en-vuelo").textContent   = stats.en_vuelo;
+        document.getElementById("stat-embarcando").textContent = stats.embarcando;
+        document.getElementById("stat-cancelados").textContent = stats.cancelado;
+
+        // Barras de progreso
+        const total = stats.total || 1;
+        const barConfig = [
+          ["bar-programado", "bar-programado-label", stats.programado],
+          ["bar-en-vuelo",   "bar-en-vuelo-label",   stats.en_vuelo],
+          ["bar-aterrizado", "bar-aterrizado-label",  stats.aterrizado],
+        ];
+        barConfig.forEach(([barId, labelId, val]) => {
+          setTimeout(() => {
+            document.getElementById(barId).style.width = `${Math.round((val/total)*100)}%`;
+            document.getElementById(labelId).textContent = val;
+          }, 300);
+        });
+      } catch (e) {
+        console.error("Error cargando estadísticas:", e);
+      }
+    }
+
+    // ── Cargar resumen de reservas ────────────────────────────
+    async function cargarReservas() {
+      try {
+        const res = await ReservasAPI.resumen();
+        document.getElementById("res-total").textContent       = res.total;
+        document.getElementById("res-confirmadas").textContent = res.confirmadas;
+        document.getElementById("res-completadas").textContent = res.completadas || 0;
+        document.getElementById("res-pendientes").textContent  = res.pendientes;
+        document.getElementById("res-canceladas").textContent  = res.canceladas;
+      } catch (e) {
+        console.error("Error cargando reservas:", e);
+      }
+    }
+
+    // ── Cargar tabla de vuelos próximos ───────────────────────
+    async function cargarVuelosRecientes() {
+      const tbody = document.getElementById("tabla-vuelos-recientes");
+      try {
+        const vuelos = await VuelosAPI.listar();
+        if (!vuelos.length) {
+          tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">No hay vuelos registrados</td></tr>`;
+          return;
+        }
+
+        const activos = vuelos
+          .filter(v => v.estado !== "cancelado" && v.estado !== "aterrizado")
+          .slice(0, 6);
+
+        const rows = (activos.length ? activos : vuelos.slice(0, 6)).map(v => `
+          <tr class="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
+            <td class="px-6 py-3.5">
+              <span class="font-semibold text-sky-400">${v.numero_vuelo}</span>
+              <p class="text-slate-500 text-xs">${v.aerolinea}</p>
+            </td>
+            <td class="px-6 py-3.5">
+              <p class="text-slate-200 text-xs">${v.origen.split("(")[0].trim()}</p>
+              <p class="text-slate-500 text-xs">→ ${v.destino.split("(")[0].trim()}</p>
+            </td>
+            <td class="px-6 py-3.5 text-slate-300 text-xs">${formatDate(v.fecha_salida)}</td>
+            <td class="px-6 py-3.5">${badge(v.estado)}</td>
+            <td class="px-6 py-3.5 text-right text-xs ${v.asientos_disponibles === 0 ? 'text-red-400' : 'text-slate-300'}">
+              ${v.asientos_disponibles}/${v.capacidad}
+            </td>
+          </tr>`).join("");
+
+        tbody.innerHTML = rows;
+      } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-red-400">⚠️ Error al conectar con la API</td></tr>`;
+      }
+    }
+
+    // ── Inicializar ───────────────────────────────────────────
+    async function init() {
+      showLoader(true);
+      await checkApiStatus();
+      await Promise.all([
+        cargarEstadisticas(),
+        cargarReservas(),
+        cargarVuelosRecientes(),
+      ]);
+      showLoader(false);
+    }
+
+    init();
+  </script>
+</body>
+</html>

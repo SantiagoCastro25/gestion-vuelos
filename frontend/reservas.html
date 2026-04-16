@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reservas — AeroGest</title>
+  <meta name="description" content="Gestiona las reservas de vuelos: crea, cancela y consulta reservas por vuelo o pasajero." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *{font-family:'Inter',sans-serif}
+    @keyframes slide-in{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes fade-in {from{opacity:0}to{opacity:1}}
+    .animate-slide-in{animation:slide-in .35s ease-out both}
+    .animate-fade-in {animation:fade-in  .3s  ease-out both}
+    .sidebar-link.active{background:rgba(56,189,248,.12);color:#38bdf8;border-left:3px solid #38bdf8}
+    ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#0f172a}::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+    .modal-overlay{backdrop-filter:blur(4px)}
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="w-64 min-h-screen bg-slate-900 border-r border-slate-800 flex flex-col fixed left-0 top-0 z-30">
+    <div class="px-6 py-5 border-b border-slate-800">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-sky-500 rounded-xl flex items-center justify-center text-xl shadow-lg shadow-sky-500/30">✈️</div>
+        <div><h1 class="text-white font-bold text-lg leading-none">AeroGest</h1><p class="text-slate-400 text-xs">Gestión de Vuelos</p></div>
+      </div>
+    </div>
+    <nav class="flex-1 px-3 py-4 space-y-1">
+      <a href="index.html"     class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 transition-all hover:bg-slate-800 hover:text-slate-100"><span class="text-lg">🏠</span> Dashboard</a>
+      <a href="vuelos.html"    class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 transition-all hover:bg-slate-800 hover:text-slate-100"><span class="text-lg">🛫</span> Vuelos</a>
+      <a href="pasajeros.html" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 transition-all hover:bg-slate-800 hover:text-slate-100"><span class="text-lg">👥</span> Pasajeros</a>
+      <a href="reservas.html"  class="sidebar-link active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all hover:bg-slate-800"><span class="text-lg">🎫</span> Reservas</a>
+    </nav>
+    <div class="px-4 py-4 border-t border-slate-800">
+      <div id="api-status" class="flex items-center gap-2 text-xs text-slate-400">
+        <span class="w-2 h-2 bg-slate-600 rounded-full animate-pulse"></span> Conectando...
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══ MAIN ═══ -->
+  <main class="ml-64 flex-1 p-8">
+    <div class="mb-6 flex items-center justify-between animate-fade-in">
+      <div>
+        <h2 class="text-3xl font-bold text-white">Gestión de <span class="text-sky-400">Reservas</span></h2>
+        <p class="text-slate-400 text-sm mt-1">Crea y administra reservas de pasajeros</p>
+      </div>
+      <button onclick="abrirModal()"
+        class="flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-white font-semibold px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-sky-500/25 active:scale-95">
+        <span>+</span> Nueva Reserva
+      </button>
+    </div>
+
+    <!-- Filtro por vuelo -->
+    <div class="mb-6 flex items-center gap-4 animate-slide-in">
+      <div class="flex items-center gap-2">
+        <label class="text-slate-400 text-sm">Filtrar por vuelo:</label>
+        <select id="filtro-vuelo" onchange="filtrarVuelo(this.value)"
+          class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-sky-500 min-w-48 transition-all">
+          <option value="">Todos los vuelos</option>
+        </select>
+      </div>
+      <button onclick="filtrarVuelo('')" class="text-slate-500 hover:text-slate-300 text-sm transition-all">✕ Limpiar filtro</button>
+    </div>
+
+    <!-- Tabla -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden animate-slide-in" style="animation-delay:.1s">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-slate-800 text-slate-500 text-xs uppercase tracking-wide">
+              <th class="px-6 py-4 text-left"># Reserva</th>
+              <th class="px-6 py-4 text-left">Vuelo</th>
+              <th class="px-6 py-4 text-left">Ruta</th>
+              <th class="px-6 py-4 text-left">Pasajero</th>
+              <th class="px-6 py-4 text-left">Asiento</th>
+              <th class="px-6 py-4 text-left">Clase</th>
+              <th class="px-6 py-4 text-left">Precio</th>
+              <th class="px-6 py-4 text-left">Estado</th>
+              <th class="px-6 py-4 text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-reservas">
+            <tr><td colspan="9" class="px-6 py-12 text-center text-slate-500">Cargando reservas...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="tabla-footer" class="px-6 py-3 border-t border-slate-800 text-slate-500 text-xs"></div>
+    </div>
+  </main>
+
+  <!-- ═══ MODAL NUEVA RESERVA ═══ -->
+  <div id="modal" class="hidden fixed inset-0 z-50 modal-overlay bg-slate-950/80 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-xl shadow-2xl animate-slide-in">
+      <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-white">Nueva Reserva</h3>
+        <button onclick="cerrarModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+      </div>
+      <form class="p-6 grid grid-cols-2 gap-4">
+        <div class="col-span-2">
+          <label class="block text-slate-400 text-xs mb-1.5 font-medium">Vuelo *</label>
+          <select id="f-vuelo"
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-sky-500 transition-all">
+            <option value="">— Selecciona un vuelo —</option>
+          </select>
+        </div>
+        <div class="col-span-2">
+          <label class="block text-slate-400 text-xs mb-1.5 font-medium">Pasajero *</label>
+          <select id="f-pasajero"
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-sky-500 transition-all">
+            <option value="">— Selecciona un pasajero —</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-slate-400 text-xs mb-1.5 font-medium">Asiento (ej: 12A)</label>
+          <input id="f-asiento" type="text" placeholder="12A" maxlength="5"
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-sky-500 transition-all" />
+        </div>
+        <div>
+          <label class="block text-slate-400 text-xs mb-1.5 font-medium">Clase</label>
+          <select id="f-clase"
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-sky-500 transition-all">
+            <option value="economica">✈ Económica</option>
+            <option value="ejecutiva">💼 Ejecutiva</option>
+            <option value="primera">👑 Primera Clase</option>
+          </select>
+        </div>
+        <div class="col-span-2">
+          <label class="block text-slate-400 text-xs mb-1.5 font-medium">Precio (COP)</label>
+          <input id="f-precio" type="number" min="0" placeholder="Ej: 350000"
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-sky-500 transition-all" />
+        </div>
+      </form>
+      <div class="px-6 pb-6 flex items-center justify-end gap-3">
+        <button onclick="cerrarModal()" class="px-5 py-2.5 rounded-xl text-slate-400 hover:text-white text-sm font-medium transition-all hover:bg-slate-800">Cancelar</button>
+        <button onclick="crearReserva()" class="px-6 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-sm font-semibold transition-all shadow-lg shadow-sky-500/25 active:scale-95">
+          🎫 Confirmar Reserva
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="global-loader" class="hidden fixed inset-0 bg-slate-950/70 z-50 flex items-center justify-center backdrop-blur-sm">
+    <div class="w-12 h-12 border-4 border-sky-500 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/reservas.js"></script>
+</body>
+</html>
