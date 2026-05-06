@@ -27,27 +27,27 @@ function renderTabla(reservas) {
   }
 
   tbody.innerHTML = reservas.map(r => `
-    <tr class="border-b border-zinc-100 hover:bg-zinc-50">
-      <td class="px-6 py-4"><span class="text-zinc-400 text-xs font-mono">#${r.id}</span></td>
-      <td class="px-6 py-4"><span class="font-semibold text-blue-600 text-sm">${r.numero_vuelo}</span></td>
+    <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+      <td class="px-6 py-4"><span class="text-slate-400 text-xs font-mono font-semibold">#${r.id}</span></td>
+      <td class="px-6 py-4"><span class="font-bold text-sky-600 text-sm">${r.numero_vuelo}</span></td>
       <td class="px-6 py-4">
-        <p class="text-zinc-800 text-xs font-medium">${r.origen}</p>
-        <p class="text-zinc-500 text-xs">→ ${r.destino}</p>
+        <p class="text-slate-900 text-xs font-bold">${r.origen}</p>
+        <p class="text-slate-500 text-xs font-medium">→ ${r.destino}</p>
       </td>
       <td class="px-6 py-4">
-        <p class="text-zinc-800 text-sm font-medium">${r.pasajero_nombre} ${r.pasajero_apellido}</p>
-        <p class="text-zinc-500 text-xs">${r.pasajero_doc}</p>
+        <p class="text-slate-900 text-sm font-bold">${r.pasajero_nombre} ${r.pasajero_apellido}</p>
+        <p class="text-slate-500 text-xs font-medium">${r.pasajero_doc}</p>
       </td>
-      <td class="px-6 py-4 font-mono text-zinc-600 text-sm">${r.asiento || "—"}</td>
-      <td class="px-6 py-4 text-zinc-600 text-sm capitalize">${r.clase}</td>
-      <td class="px-6 py-4 text-zinc-800 font-medium text-sm">${formatearPrecio(r.precio)}</td>
+      <td class="px-6 py-4 font-mono text-slate-600 text-sm font-semibold">${r.asiento || "—"}</td>
+      <td class="px-6 py-4 text-slate-600 text-sm capitalize font-medium">${r.clase}</td>
+      <td class="px-6 py-4 text-slate-900 font-bold text-sm">${formatearPrecio(r.precio)}</td>
       <td class="px-6 py-4">${badge(r.estado)}</td>
       <td class="px-6 py-4 text-right">
         <div class="flex items-center justify-end gap-2">
           ${r.estado !== 'cancelada' ? `<button onclick="confirmarCancelar(${r.id})"
-            class="p-1.5 rounded-lg bg-zinc-100 hover:bg-amber-100 text-zinc-500 hover:text-amber-600 transition-all text-sm" title="Cancelar Reserva">🚫</button>` : ''}
+            class="p-1.5 rounded-lg bg-slate-100 hover:bg-amber-100 text-slate-500 hover:text-amber-600 transition-all text-sm" title="Cancelar Reserva">🚫</button>` : ''}
           <button onclick="confirmarEliminar(${r.id})"
-            class="p-1.5 rounded-lg bg-zinc-100 hover:bg-rose-100 text-zinc-500 hover:text-rose-600 transition-all text-sm" title="Eliminar del Sistema">🗑️</button>
+            class="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-100 text-slate-500 hover:text-rose-600 transition-all text-sm" title="Eliminar del Sistema">🗑️</button>
         </div>
       </td>
     </tr>`).join("");

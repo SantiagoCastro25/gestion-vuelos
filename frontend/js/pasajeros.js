@@ -27,21 +27,21 @@ function renderTabla(pasajeros) {
   }
 
   tbody.innerHTML = pasajeros.map(p => `
-    <tr class="border-b border-zinc-100 hover:bg-zinc-50">
-      <td class="px-6 py-4"><span class="font-semibold text-zinc-800">${p.nombre} ${p.apellido}</span></td>
-      <td class="px-6 py-4 text-zinc-600 text-sm">
-        <span class="uppercase text-xs text-zinc-400 mr-1">${p.tipo_documento.substring(0,3)}</span>
+    <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+      <td class="px-6 py-4"><span class="font-bold text-slate-900">${p.nombre} ${p.apellido}</span></td>
+      <td class="px-6 py-4 text-slate-600 text-sm font-semibold">
+        <span class="uppercase text-xs text-slate-400 mr-1">${p.tipo_documento.substring(0,3)}</span>
         ${p.numero_documento}
       </td>
-      <td class="px-6 py-4 text-zinc-500 text-sm">${p.email}</td>
-      <td class="px-6 py-4 text-zinc-500 text-sm">${p.telefono || "—"}</td>
-      <td class="px-6 py-4 text-zinc-500 text-sm">${p.nacionalidad || "—"}</td>
+      <td class="px-6 py-4 text-slate-600 text-sm font-medium">${p.email}</td>
+      <td class="px-6 py-4 text-slate-600 text-sm font-medium">${p.telefono || "—"}</td>
+      <td class="px-6 py-4 text-slate-600 text-sm font-medium">${p.nacionalidad || "—"}</td>
       <td class="px-6 py-4 text-right">
         <div class="flex items-center justify-end gap-2">
           <button onclick="editarPasajero(${p.id})"
-            class="p-1.5 rounded-lg bg-zinc-100 hover:bg-blue-100 text-zinc-500 hover:text-blue-600 transition-all text-sm" title="Editar">✏️</button>
+            class="p-1.5 rounded-lg bg-slate-100 hover:bg-sky-100 text-slate-500 hover:text-sky-600 transition-all text-sm" title="Editar">✏️</button>
           <button onclick="confirmarEliminar(${p.id}, '${p.nombre}')"
-            class="p-1.5 rounded-lg bg-zinc-100 hover:bg-rose-100 text-zinc-500 hover:text-rose-600 transition-all text-sm" title="Eliminar">🗑️</button>
+            class="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-100 text-slate-500 hover:text-rose-600 transition-all text-sm" title="Eliminar">🗑️</button>
         </div>
       </td>
     </tr>`).join("");

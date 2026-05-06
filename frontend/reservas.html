@@ -10,43 +10,33 @@
 </head>
 <body class="text-zinc-900 flex flex-col">
 
-  <div class="top-bar">
-    <button onclick="toggleSidebar()" style="background:none;border:none;cursor:pointer;color:#a1a1aa;display:flex;align-items:center;">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    </button>
-    <span style="font-size:14px;font-weight:600;color:#e4e4e7;">AeroGest</span>
-  </div>
-
-  <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
-
-  <aside class="sidebar" id="sidebar">
-    <div style="padding:20px 16px 16px;border-bottom:1px solid #141414;">
-      <div class="flex items-center gap-2.5">
-        <div style="width:32px;height:32px;background:#18181b;border:1px solid #27272a;border-radius:8px;display:flex;align-items:center;justify-content:center;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-        </div>
-        <div><p style="font-size:13px;font-weight:600;color:#e4e4e7;line-height:1.2;">AeroGest</p><p style="font-size:11px;color:#52525b;line-height:1.2;">Flight Management</p></div>
+  <!-- Top Navigation (Pill) -->
+  <nav class="top-nav fade-up" style="animation-delay: 0.1s;">
+    <div class="flex items-center gap-3">
+      <div style="width:36px;height:36px;background:#0f172a;border-radius:10px;display:flex;align-items:center;justify-content:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
       </div>
+      <span style="font-size:18px;font-weight:800;color:#0f172a;letter-spacing:-0.03em;">AeroGest</span>
     </div>
-    <nav style="padding:12px 8px;flex:1;" class="space-y-0.5">
-      <a href="index.html"     class="nav-link" onclick="closeSidebar()"><span class="nav-dot"></span>Dashboard</a>
-      <a href="vuelos.html"    class="nav-link" onclick="closeSidebar()"><span class="nav-dot"></span>Vuelos</a>
-      <a href="pasajeros.html" class="nav-link" onclick="closeSidebar()"><span class="nav-dot"></span>Pasajeros</a>
-      <a href="reservas.html"  class="nav-link active" onclick="closeSidebar()"><span class="nav-dot"></span>Reservas</a>
-    </nav>
-    <div style="padding:12px 16px;border-top:1px solid #141414;">
-      <div class="flex items-center gap-2" style="font-size:11px;color:#52525b;">
-        <span id="status-dot" style="width:6px;height:6px;border-radius:50%;background:#3f3f46;display:inline-block;flex-shrink:0;"></span>
-        <span id="status-text">Conectando...</span>
-      </div>
+    
+    <div class="nav-links">
+      <a href="index.html"     class="nav-link">Resumen</a>
+      <a href="vuelos.html"    class="nav-link">Vuelos</a>
+      <a href="pasajeros.html" class="nav-link">Pasajeros</a>
+      <a href="reservas.html"  class="nav-link active">Reservas</a>
     </div>
-  </aside>
+
+    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full" style="background:#f1f5f9;border:1px solid #e2e8f0;">
+      <span id="status-dot" style="width:8px;height:8px;border-radius:50%;background:#94a3b8;display:inline-block;flex-shrink:0;box-shadow:0 0 0 2px rgba(148,163,184,0.2);"></span>
+      <span id="status-text" style="font-size:12px;font-weight:600;color:#64748b;">Conectando...</span>
+    </div>
+  </nav>
 
   <main class="main-content">
-    <div class="flex items-center justify-between mb-6 fade-up" style="animation-delay:.05s;flex-wrap:wrap;gap:12px;">
+    <div class="flex items-center justify-between mb-2 fade-up" style="animation-delay:.15s;flex-wrap:wrap;gap:12px;">
       <div>
-        <h1 style="font-size:20px;font-weight:600;color:#e4e4e7;">Reservas</h1>
-        <p style="font-size:13px;color:#52525b;margin-top:3px;">Crea y administra reservas de pasajeros</p>
+        <h1 style="font-size:24px;font-weight:800;color:#0f172a;letter-spacing:-0.03em;">Gestión de Reservas</h1>
+        <p style="font-size:14px;color:#64748b;margin-top:2px;">Control de boletos y estados de pago</p>
       </div>
       <button class="btn-primary" onclick="abrirModal()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -114,8 +104,7 @@
   </div>
 
   <script>
-    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('active'); }
-    function closeSidebar()  { document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('active'); }
+    // Scripts dependientes del DOM se inicializan desde reservas.js
   </script>
   <script src="js/api.js"></script>
   <script src="js/reservas.js"></script>

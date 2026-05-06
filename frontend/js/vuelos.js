@@ -34,37 +34,37 @@ function renderTabla(vuelos) {
   footer.textContent = `Mostrando ${vuelos.length} vuelo${vuelos.length !== 1 ? "s" : ""}`;
 
   if (!vuelos.length) {
-    tbody.innerHTML = `<tr><td colspan="9" class="px-6 py-12 text-center text-zinc-500">No hay vuelos con ese filtro</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" class="px-6 py-12 text-center text-slate-500 font-medium">No hay vuelos con ese filtro</td></tr>`;
     return;
   }
 
   tbody.innerHTML = vuelos.map(v => `
-    <tr class="border-b border-zinc-100 hover:bg-zinc-50">
-      <td class="px-6 py-4"><span class="font-semibold text-blue-600">${v.numero_vuelo}</span></td>
-      <td class="px-6 py-4 text-zinc-600 text-sm">${v.aerolinea}</td>
+    <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+      <td class="px-6 py-4"><span class="font-bold text-sky-600 text-sm tracking-tight">${v.numero_vuelo}</span></td>
+      <td class="px-6 py-4 text-slate-600 text-sm font-semibold">${v.aerolinea}</td>
       <td class="px-6 py-4">
-        <p class="text-zinc-800 text-xs font-medium">${v.origen}</p>
-        <p class="text-zinc-500 text-xs">→ ${v.destino}</p>
+        <p class="text-slate-900 text-sm font-bold">${v.origen}</p>
+        <p class="text-slate-500 text-xs font-medium">→ ${v.destino}</p>
       </td>
-      <td class="px-6 py-4 text-zinc-600 text-xs">${formatDate(v.fecha_salida)}</td>
-      <td class="px-6 py-4 text-zinc-600 text-xs">${formatDate(v.fecha_llegada)}</td>
-      <td class="px-6 py-4 text-zinc-500 text-xs">${v.terminal || "—"} / ${v.puerta || "—"}</td>
+      <td class="px-6 py-4 text-slate-700 text-xs font-medium">${formatDate(v.fecha_salida)}</td>
+      <td class="px-6 py-4 text-slate-700 text-xs font-medium">${formatDate(v.fecha_llegada)}</td>
+      <td class="px-6 py-4 text-slate-500 text-xs font-medium">${v.terminal || "—"} / ${v.puerta || "—"}</td>
       <td class="px-6 py-4">
-        <div class="flex items-center gap-1.5">
-          <div class="flex-1 h-1.5 bg-zinc-200 rounded-full overflow-hidden w-16">
-            <div class="h-full ${v.asientos_disponibles === 0 ? 'bg-rose-500' : 'bg-blue-500'} rounded-full"
+        <div class="flex items-center gap-2">
+          <div class="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden w-16">
+            <div class="h-full ${v.asientos_disponibles === 0 ? 'bg-rose-500' : 'bg-sky-500'} rounded-full transition-all duration-500"
               style="width:${Math.round(((v.capacidad - v.asientos_disponibles)/v.capacidad)*100)}%"></div>
           </div>
-          <span class="text-xs font-medium ${v.asientos_disponibles === 0 ? 'text-rose-600' : 'text-zinc-600'}">${v.asientos_disponibles}/${v.capacidad}</span>
+          <span class="text-xs font-bold ${v.asientos_disponibles === 0 ? 'text-rose-600' : 'text-slate-700'}">${v.capacidad - v.asientos_disponibles}/${v.capacidad}</span>
         </div>
       </td>
       <td class="px-6 py-4">${badge(v.estado)}</td>
       <td class="px-6 py-4 text-right">
         <div class="flex items-center justify-end gap-2">
           <button onclick="editarVuelo(${v.id})"
-            class="p-1.5 rounded-lg bg-zinc-100 hover:bg-blue-100 text-zinc-500 hover:text-blue-600 transition-all text-sm" title="Editar">✏️</button>
+            class="p-1.5 rounded-lg bg-slate-100 hover:bg-sky-100 text-slate-500 hover:text-sky-600 transition-all text-sm" title="Editar">✏️</button>
           <button onclick="confirmarEliminar(${v.id}, '${v.numero_vuelo}')"
-            class="p-1.5 rounded-lg bg-zinc-100 hover:bg-rose-100 text-zinc-500 hover:text-rose-600 transition-all text-sm" title="Eliminar">🗑️</button>
+            class="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-100 text-slate-500 hover:text-rose-600 transition-all text-sm" title="Eliminar">🗑️</button>
         </div>
       </td>
     </tr>`).join("");
