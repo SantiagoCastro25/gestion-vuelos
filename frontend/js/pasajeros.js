@@ -145,13 +145,6 @@ async function eliminarPasajero(id, nombre) {
 
 // ── Init ──────────────────────────────────────────────────────
 async function init() {
-  try {
-    await fetch("http://localhost:5000/api/health");
-    const dot  = document.getElementById('status-dot');
-    const text = document.getElementById('status-text');
-    if (dot)  dot.style.background  = '#22c55e';
-    if (text) { text.textContent = 'API conectada'; text.style.color = '#4ade80'; }
-  } catch {}
   cargarPasajeros();
 }
 

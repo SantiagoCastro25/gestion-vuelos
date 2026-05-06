@@ -12,19 +12,8 @@ async function cargarVuelos(estado = "") {
   try {
     vuelosData = await VuelosAPI.listar(estado);
     renderTabla(vuelosData);
-    
-    // Status indicators
-    const dot  = document.getElementById('status-dot');
-    const text = document.getElementById('status-text');
-    if (dot)  dot.style.background  = '#22c55e';
-    if (text) { text.textContent = 'API conectada'; text.style.color = '#15803d'; }
-    
   } catch (e) {
     tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:#e11d48;padding:48px 0;">No se pudo conectar con la API.</td></tr>`;
-    const dot  = document.getElementById('status-dot');
-    const text = document.getElementById('status-text');
-    if (dot)  dot.style.background  = '#e11d48';
-    if (text) { text.textContent = 'API desconectada'; text.style.color = '#be123c'; }
   }
 }
 
