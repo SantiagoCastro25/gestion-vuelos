@@ -21,7 +21,8 @@ function handleReservas(string $method, ?string $seg, ?string $action, array $bo
         if ($method === 'GET') {
             $vid = (int)($_GET['vuelo_id'] ?? 0);
             $sql = "SELECT r.*, v.numero_vuelo, v.origen, v.destino, v.fecha_salida,
-                           CONCAT(p.nombre,' ',p.apellido) AS pasajero
+                           CONCAT(p.nombre,' ',p.apellido) AS pasajero,
+                           p.documento AS pasajero_documento
                     FROM reservas r
                     LEFT JOIN vuelos v ON r.vuelo_id=v.id
                     LEFT JOIN pasajeros p ON r.pasajero_id=p.id";

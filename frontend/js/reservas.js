@@ -35,12 +35,12 @@ function renderTabla(reservas) {
         <p class="text-slate-500 text-xs font-medium">→ ${r.destino}</p>
       </td>
       <td class="px-6 py-4">
-        <p class="text-slate-900 text-sm font-bold">${r.pasajero_nombre} ${r.pasajero_apellido}</p>
-        <p class="text-slate-500 text-xs font-medium">${r.pasajero_doc}</p>
+        <p class="text-slate-900 text-sm font-bold">${r.pasajero}</p>
+        <p class="text-slate-500 text-xs font-medium">${r.pasajero_documento || "—"}</p>
       </td>
       <td class="px-6 py-4 font-mono text-slate-600 text-sm font-semibold">${r.asiento || "—"}</td>
       <td class="px-6 py-4 text-slate-600 text-sm capitalize font-medium">${r.clase}</td>
-      <td class="px-6 py-4 text-slate-900 font-bold text-sm">${formatearPrecio(r.precio)}</td>
+      <td class="px-6 py-4 text-slate-900 font-bold text-sm">${formatPrice(r.precio)}</td>
       <td class="px-6 py-4">${badge(r.estado)}</td>
       <td class="px-6 py-4 text-right">
         <div class="flex items-center justify-end gap-2">
