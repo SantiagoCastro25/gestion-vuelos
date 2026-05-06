@@ -1,154 +1,119 @@
 <!DOCTYPE html>
-<html lang="es" class="dark">
+<html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pasajeros — AeroGest</title>
   <meta name="description" content="Gestiona el registro de pasajeros del aeropuerto: datos personales, documentos y búsqueda rápida." />
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <style>
-    * { font-family:'Inter',sans-serif; }
-    @keyframes slide-in { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-    @keyframes fade-in  { from{opacity:0} to{opacity:1} }
-    .animate-slide-in{animation:slide-in .35s ease-out both}
-    .animate-fade-in {animation:fade-in  .3s  ease-out both}
-    .sidebar-link.active{background:rgba(56,189,248,.12);color:#38bdf8;border-left:3px solid #38bdf8}
-    ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:#0f172a} ::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
-    .modal-overlay{backdrop-filter:blur(4px)}
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex">
+<body class="text-zinc-100 flex flex-col">
 
-  <!-- ═══ SIDEBAR ═══ -->
-  <aside class="w-64 min-h-screen bg-slate-900 border-r border-slate-800 flex flex-col fixed left-0 top-0 z-30">
-    <div class="px-6 py-5 border-b border-slate-800">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-sky-500 rounded-xl flex items-center justify-center text-xl shadow-lg shadow-sky-500/30">✈️</div>
-        <div><h1 class="text-white font-bold text-lg leading-none">AeroGest</h1><p class="text-slate-400 text-xs">Gestión de Vuelos</p></div>
+  <div class="top-bar">
+    <button onclick="toggleSidebar()" style="background:none;border:none;cursor:pointer;color:#a1a1aa;display:flex;align-items:center;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span style="font-size:14px;font-weight:600;color:#e4e4e7;">AeroGest</span>
+  </div>
+
+  <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div style="padding:20px 16px 16px;border-bottom:1px solid #141414;">
+      <div class="flex items-center gap-2.5">
+        <div style="width:32px;height:32px;background:#18181b;border:1px solid #27272a;border-radius:8px;display:flex;align-items:center;justify-content:center;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        </div>
+        <div><p style="font-size:13px;font-weight:600;color:#e4e4e7;line-height:1.2;">AeroGest</p><p style="font-size:11px;color:#52525b;line-height:1.2;">Flight Management</p></div>
       </div>
     </div>
-    <nav class="flex-1 px-3 py-4 space-y-1">
-      <a href="index.html"     class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 transition-all hover:bg-slate-800 hover:text-slate-100"><span class="text-lg">🏠</span> Dashboard</a>
-      <a href="vuelos.html"    class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 transition-all hover:bg-slate-800 hover:text-slate-100"><span class="text-lg">🛫</span> Vuelos</a>
-      <a href="pasajeros.html" class="sidebar-link active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all hover:bg-slate-800"><span class="text-lg">👥</span> Pasajeros</a>
-      <a href="reservas.html"  class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 transition-all hover:bg-slate-800 hover:text-slate-100"><span class="text-lg">🎫</span> Reservas</a>
+    <nav style="padding:12px 8px;flex:1;" class="space-y-0.5">
+      <a href="index.html"     class="nav-link" onclick="closeSidebar()"><span class="nav-dot"></span>Dashboard</a>
+      <a href="vuelos.html"    class="nav-link" onclick="closeSidebar()"><span class="nav-dot"></span>Vuelos</a>
+      <a href="pasajeros.html" class="nav-link active" onclick="closeSidebar()"><span class="nav-dot"></span>Pasajeros</a>
+      <a href="reservas.html"  class="nav-link" onclick="closeSidebar()"><span class="nav-dot"></span>Reservas</a>
     </nav>
-    <div class="px-4 py-4 border-t border-slate-800">
-      <div id="api-status" class="flex items-center gap-2 text-xs text-slate-400">
-        <span class="w-2 h-2 bg-slate-600 rounded-full animate-pulse"></span> Conectando...
+    <div style="padding:12px 16px;border-top:1px solid #141414;">
+      <div class="flex items-center gap-2" style="font-size:11px;color:#52525b;">
+        <span id="status-dot" style="width:6px;height:6px;border-radius:50%;background:#3f3f46;display:inline-block;flex-shrink:0;"></span>
+        <span id="status-text">Conectando...</span>
       </div>
     </div>
   </aside>
 
-  <!-- ═══ MAIN ═══ -->
-  <main class="ml-64 flex-1 p-8">
-    <div class="mb-6 flex items-center justify-between animate-fade-in">
+  <main class="main-content">
+    <div class="flex items-center justify-between mb-6 fade-up" style="animation-delay:.05s;flex-wrap:wrap;gap:12px;">
       <div>
-        <h2 class="text-3xl font-bold text-white">Gestión de <span class="text-sky-400">Pasajeros</span></h2>
-        <p class="text-slate-400 text-sm mt-1">Registro y consulta de pasajeros</p>
+        <h1 style="font-size:20px;font-weight:600;color:#e4e4e7;">Pasajeros</h1>
+        <p style="font-size:13px;color:#52525b;margin-top:3px;">Registro y consulta de pasajeros</p>
       </div>
-      <button onclick="abrirModal()"
-        class="flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-white font-semibold px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-sky-500/25 active:scale-95">
-        <span>+</span> Nuevo Pasajero
+      <button class="btn-primary" onclick="abrirModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nuevo Pasajero
       </button>
     </div>
 
-    <!-- Buscador -->
-    <div class="mb-6 animate-slide-in">
-      <div class="relative max-w-md">
-        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">🔍</span>
-        <input id="buscador" type="text" placeholder="Buscar por nombre, documento o email..."
-          oninput="buscarPasajero(this.value)"
-          class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-11 pr-4 py-2.5 text-white text-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all" />
+    <div class="mb-5 fade-up" style="animation-delay:.1s;">
+      <div style="position:relative;max-width:380px;">
+        <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#52525b;" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="buscador" type="text" placeholder="Nombre, documento o email..." oninput="buscarPasajero(this.value)"
+          style="width:100%;background:#0f0f0f;border:1px solid #1c1c1e;border-radius:8px;padding:9px 12px 9px 34px;color:#e4e4e7;font-size:13px;outline:none;transition:border-color .15s;"
+          onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='#1c1c1e'" />
       </div>
     </div>
 
-    <!-- Tabla -->
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden animate-slide-in" style="animation-delay:.1s">
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="border-b border-slate-800 text-slate-500 text-xs uppercase tracking-wide">
-              <th class="px-6 py-4 text-left">Pasajero</th>
-              <th class="px-6 py-4 text-left">Documento</th>
-              <th class="px-6 py-4 text-left">Email</th>
-              <th class="px-6 py-4 text-left">Teléfono</th>
-              <th class="px-6 py-4 text-left">Nacionalidad</th>
-              <th class="px-6 py-4 text-right">Acciones</th>
-            </tr>
-          </thead>
+    <div class="fade-up" style="animation-delay:.15s;background:#0f0f0f;border:1px solid #1c1c1e;border-radius:12px;overflow:hidden;">
+      <div style="overflow-x:auto;">
+        <table class="w-full data-table" style="min-width:500px;">
+          <thead><tr>
+            <th>Pasajero</th><th>Documento</th><th>Email</th><th>Teléfono</th><th>Nacionalidad</th><th style="text-align:right;">Acciones</th>
+          </tr></thead>
           <tbody id="tabla-pasajeros">
-            <tr><td colspan="6" class="px-6 py-12 text-center text-slate-500">Cargando pasajeros...</td></tr>
+            <tr><td colspan="6" style="text-align:center;color:#3f3f46;padding:48px 0;">Cargando pasajeros...</td></tr>
           </tbody>
         </table>
       </div>
-      <div id="tabla-footer" class="px-6 py-3 border-t border-slate-800 text-slate-500 text-xs"></div>
+      <div id="tabla-footer" style="padding:10px 16px;border-top:1px solid #141414;font-size:11px;color:#3f3f46;"></div>
     </div>
   </main>
 
-  <!-- ═══ MODAL ═══ -->
-  <div id="modal" class="hidden fixed inset-0 z-50 modal-overlay bg-slate-950/80 flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-xl shadow-2xl animate-slide-in">
-      <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
-        <h3 id="modal-title" class="text-lg font-semibold text-white">Nuevo Pasajero</h3>
-        <button onclick="cerrarModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+  <!-- Modal -->
+  <div id="modal" class="hidden fixed inset-0 z-50 modal-bg flex items-center justify-center p-4">
+    <div class="modal-box fade-up" style="max-width:520px;">
+      <div style="padding:18px 22px;border-bottom:1px solid #141414;display:flex;align-items:center;justify-content:space-between;">
+        <p style="font-size:14px;font-weight:600;color:#e4e4e7;" id="modal-title">Nuevo Pasajero</p>
+        <button onclick="cerrarModal()" class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
-      <form id="form-pasajero" class="p-6 grid grid-cols-2 gap-4">
+      <form id="form-pasajero" style="padding:20px 22px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
         <input type="hidden" id="pasajero-id" />
-        <div>
-          <label class="block text-slate-400 text-xs mb-1.5 font-medium">Nombre *</label>
-          <input id="f-nombre" type="text" placeholder="Carlos" required
-            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-sky-500 transition-all" />
-        </div>
-        <div>
-          <label class="block text-slate-400 text-xs mb-1.5 font-medium">Apellido *</label>
-          <input id="f-apellido" type="text" placeholder="Rodríguez" required
-            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-sky-500 transition-all" />
-        </div>
-        <div>
-          <label class="block text-slate-400 text-xs mb-1.5 font-medium">Tipo Documento</label>
-          <select id="f-tipo-doc"
-            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-sky-500 transition-all">
-            <option value="cedula">Cédula</option>
-            <option value="pasaporte">Pasaporte</option>
-            <option value="tarjeta_id">Tarjeta de Identidad</option>
+        <div><label class="lbl">Nombre *</label><input id="f-nombre" type="text" placeholder="Carlos" required class="field" /></div>
+        <div><label class="lbl">Apellido *</label><input id="f-apellido" type="text" placeholder="Rodríguez" required class="field" /></div>
+        <div><label class="lbl">Tipo Documento</label>
+          <select id="f-tipo-doc" class="field">
+            <option value="cedula">Cédula</option><option value="pasaporte">Pasaporte</option><option value="tarjeta_id">Tarjeta de Identidad</option>
           </select>
         </div>
-        <div>
-          <label class="block text-slate-400 text-xs mb-1.5 font-medium">Número Documento *</label>
-          <input id="f-documento" type="text" placeholder="1020304050" required
-            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-sky-500 transition-all" />
-        </div>
-        <div class="col-span-2">
-          <label class="block text-slate-400 text-xs mb-1.5 font-medium">Email *</label>
-          <input id="f-email" type="email" placeholder="correo@email.com" required
-            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-sky-500 transition-all" />
-        </div>
-        <div>
-          <label class="block text-slate-400 text-xs mb-1.5 font-medium">Teléfono</label>
-          <input id="f-telefono" type="text" placeholder="3001234567"
-            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-sky-500 transition-all" />
-        </div>
-        <div>
-          <label class="block text-slate-400 text-xs mb-1.5 font-medium">Nacionalidad</label>
-          <input id="f-nacionalidad" type="text" placeholder="Colombia"
-            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-sky-500 transition-all" />
-        </div>
+        <div><label class="lbl">Número Documento *</label><input id="f-documento" type="text" placeholder="1020304050" required class="field" /></div>
+        <div style="grid-column:span 2;"><label class="lbl">Email *</label><input id="f-email" type="email" placeholder="correo@email.com" required class="field" /></div>
+        <div><label class="lbl">Teléfono</label><input id="f-telefono" type="text" placeholder="3001234567" class="field" /></div>
+        <div><label class="lbl">Nacionalidad</label><input id="f-nacionalidad" type="text" placeholder="Colombia" class="field" /></div>
       </form>
-      <div class="px-6 pb-6 flex items-center justify-end gap-3">
-        <button onclick="cerrarModal()" class="px-5 py-2.5 rounded-xl text-slate-400 hover:text-white text-sm font-medium transition-all hover:bg-slate-800">Cancelar</button>
-        <button onclick="guardarPasajero()" class="px-6 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-sm font-semibold transition-all shadow-lg shadow-sky-500/25 active:scale-95">
-          💾 Guardar
-        </button>
+      <div style="padding:0 22px 20px;display:flex;align-items:center;justify-content:flex-end;gap:10px;">
+        <button onclick="cerrarModal()" class="btn-cancel-text">Cancelar</button>
+        <button onclick="guardarPasajero()" class="btn-save">Guardar</button>
       </div>
     </div>
   </div>
 
-  <div id="global-loader" class="hidden fixed inset-0 bg-slate-950/70 z-50 flex items-center justify-center backdrop-blur-sm">
-    <div class="w-12 h-12 border-4 border-sky-500 border-t-transparent rounded-full animate-spin"></div>
+  <div id="global-loader" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background:rgba(9,9,9,.8);backdrop-filter:blur(4px);">
+    <div style="width:32px;height:32px;border:2px solid #27272a;border-top-color:#3b82f6;border-radius:50%;animation:spin .7s linear infinite;"></div>
   </div>
 
+  <script>
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('active'); }
+    function closeSidebar()  { document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('active'); }
+  </script>
   <script src="js/api.js"></script>
   <script src="js/pasajeros.js"></script>
 </body>

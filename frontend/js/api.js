@@ -1,9 +1,11 @@
 /**
- * api.js - Cliente centralizado de la API
- * Todas las funciones que hablan con el backend Flask
+ * api.js - Cliente centralizado de la API PHP
+ * La URL se detecta automáticamente — funciona desde cualquier dispositivo/IP.
  */
 
-const API_BASE = "http://localhost:5000/api";
+// Detecta la raíz del proyecto dinámicamente
+const _root = window.location.pathname.split('/frontend/')[0];
+const API_BASE = `${window.location.origin}${_root}/api`;
 
 // ── Utilidades ────────────────────────────────────────────────
 async function request(method, endpoint, body = null) {
@@ -67,20 +69,27 @@ function showToast(msg, type = "success") {
   const existing = document.getElementById("toast-container");
   if (existing) existing.remove();
 
-  const colors = {
-    success: "bg-emerald-500",
-    error:   "bg-red-500",
-    warning: "bg-amber-500",
-    info:    "bg-sky-500",
+  const accent = {
+    success: "#22c55e",
+    error:   "#ef4444",
+    warning: "#f59e0b",
+    info:    "#3b82f6",
   };
 
   const container = document.createElement("div");
   container.id = "toast-container";
-  container.className = `fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-xl text-white shadow-2xl
-    ${colors[type] || colors.success} animate-slide-in`;
+  container.style.cssText = `
+    position:fixed;bottom:24px;right:24px;z-index:9999;
+    display:flex;align-items:center;gap:12px;
+    padding:12px 18px;border-radius:10px;
+    background:#111111;border:1px solid #1c1c1e;
+    box-shadow:0 16px 48px rgba(0,0,0,.6);
+    font-size:13px;color:#e4e4e7;font-family:'Inter',sans-serif;
+    animation:fadeUp .3s ease both;
+  `;
   container.innerHTML = `
-    <span class="text-lg">${type === "success" ? "✅" : type === "error" ? "❌" : type === "warning" ? "⚠️" : "ℹ️"}</span>
-    <span class="font-medium">${msg}</span>
+    <span style="width:4px;height:32px;border-radius:4px;background:${accent[type] || accent.success};flex-shrink:0;"></span>
+    <span>${msg}</span>
   `;
   document.body.appendChild(container);
   setTimeout(() => container.remove(), 3500);
@@ -104,18 +113,19 @@ function formatPrice(price) {
 
 // ── Badges de estado ─────────────────────────────────────────
 const ESTADO_BADGE = {
-  programado: { cls: "bg-sky-500/20 text-sky-300 border-sky-500/30",     label: "Programado" },
-  embarcando: { cls: "bg-amber-500/20 text-amber-300 border-amber-500/30", label: "Embarcando" },
-  en_vuelo:   { cls: "bg-violet-500/20 text-violet-300 border-violet-500/30", label: "En Vuelo" },
-  aterrizado: { cls: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30", label: "Aterrizado" },
-  cancelado:  { cls: "bg-red-500/20 text-red-300 border-red-500/30",      label: "Cancelado" },
-  confirmada: { cls: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30", label: "Confirmada" },
-  completada: { cls: "bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-500/30", label: "Completada" },
-  pendiente:  { cls: "bg-amber-500/20 text-amber-300 border-amber-500/30", label: "Pendiente" },
-  cancelada:  { cls: "bg-red-500/20 text-red-300 border-red-500/30",      label: "Cancelada" },
+  programado: { cls: "badge-sky",     label: "Programado" },
+  embarcando: { cls: "badge-amber",   label: "Embarcando" },
+  en_vuelo:   { cls: "badge-violet",  label: "En Vuelo" },
+  aterrizado: { cls: "badge-emerald", label: "Aterrizado" },
+  cancelado:  { cls: "badge-red",     label: "Cancelado" },
+  confirmada: { cls: "badge-emerald", label: "Confirmada" },
+  completada: { cls: "badge-fuchsia", label: "Completada" },
+  pendiente:  { cls: "badge-amber",   label: "Pendiente" },
+  cancelada:  { cls: "badge-red",     label: "Cancelada" },
 };
 
+// Badge CSS is defined inline in each HTML page (minimalist style)
 function badge(estado) {
-  const b = ESTADO_BADGE[estado] || { cls: "bg-slate-500/20 text-slate-300", label: estado };
-  return `<span class="px-2.5 py-1 rounded-full text-xs font-semibold border ${b.cls}">${b.label}</span>`;
+  const b = ESTADO_BADGE[estado] || { cls: "badge-zinc", label: estado };
+  return `<span class="badge ${b.cls}">${b.label}</span>`;
 }

@@ -11,7 +11,7 @@ async function cargarReservas(vueloId = "") {
     const reservas = await ReservasAPI.listar(vueloId);
     renderTabla(reservas);
   } catch (e) {
-    tbody.innerHTML = `<tr><td colspan="9" class="px-6 py-10 text-center text-red-400">⚠️ No se pudo conectar con la API</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:#f87171;padding:48px 0;">No se pudo conectar con la API</td></tr>`;
   }
 }
 
@@ -192,9 +192,10 @@ async function eliminarReserva(id) {
 async function init() {
   try {
     await fetch("http://localhost:5000/api/health");
-    document.getElementById("api-status").innerHTML =
-      `<span class="w-2 h-2 bg-emerald-400 rounded-full"></span> API conectada`;
-    document.getElementById("api-status").className = "flex items-center gap-2 text-xs text-emerald-400";
+    const dot  = document.getElementById('status-dot');
+    const text = document.getElementById('status-text');
+    if (dot)  dot.style.background  = '#22c55e';
+    if (text) { text.textContent = 'API conectada'; text.style.color = '#4ade80'; }
   } catch {}
 
   await Promise.all([

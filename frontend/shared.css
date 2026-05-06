@@ -1,0 +1,84 @@
+/* shared.css — Estilos compartidos entre todas las páginas de AeroGest */
+
+*, *::before, *::after { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+body { background: #090909; }
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+.fade-up { animation: fadeUp 0.4s ease both; }
+@keyframes spin { to { transform:rotate(360deg) } }
+
+/* ── Sidebar ── */
+.sidebar { width:220px; background:#0a0a0a; border-right:1px solid #141414; position:fixed; left:0; top:0; height:100vh; display:flex; flex-direction:column; z-index:40; transition:transform .3s ease; }
+.nav-link { display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:8px; font-size:13.5px; font-weight:500; color:#71717a; transition:background .15s,color .15s; text-decoration:none; }
+.nav-link:hover, .nav-link.active { background:#141414; color:#e4e4e7; }
+.nav-link.active .nav-dot { background:#3b82f6; }
+.nav-dot { width:6px; height:6px; border-radius:50%; background:#3f3f46; flex-shrink:0; }
+
+/* ── Layout ── */
+.main-content { margin-left:220px; flex:1; padding:32px 36px; min-height:100vh; }
+.sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:30; }
+.top-bar { display:none; align-items:center; gap:12px; padding:14px 18px; background:#0a0a0a; border-bottom:1px solid #141414; position:sticky; top:0; z-index:20; }
+
+/* ── Inputs ── */
+.field { width:100%; background:#0a0a0a; border:1px solid #1c1c1e; border-radius:8px; padding:9px 12px; color:#e4e4e7; font-size:13px; outline:none; transition:border-color .15s; }
+.field:focus { border-color:#3b82f6; }
+.field::placeholder { color:#3f3f46; }
+select.field option { background:#111111; }
+
+/* ── Buttons ── */
+.btn-primary { display:inline-flex; align-items:center; gap:7px; padding:8px 16px; border-radius:8px; font-size:13px; font-weight:500; background:#18181b; border:1px solid #27272a; color:#e4e4e7; cursor:pointer; transition:all .15s; }
+.btn-primary:hover { background:#1f1f23; border-color:#3f3f46; }
+.btn-primary:active { transform:scale(.98); }
+.btn-save { padding:8px 18px; border-radius:8px; font-size:13px; font-weight:500; background:#1d4ed8; border:1px solid #2563eb; color:#fff; cursor:pointer; transition:background .15s; }
+.btn-save:hover { background:#2563eb; }
+.btn-cancel-text { padding:8px 16px; border-radius:8px; font-size:13px; font-weight:500; color:#52525b; background:none; border:1px solid transparent; cursor:pointer; transition:all .15s; }
+.btn-cancel-text:hover { color:#e4e4e7; border-color:#27272a; }
+
+/* ── Table ── */
+.data-table th { padding:10px 16px; font-size:11px; font-weight:500; color:#52525b; text-transform:uppercase; letter-spacing:.06em; text-align:left; border-bottom:1px solid #141414; white-space:nowrap; }
+.data-table td { padding:13px 16px; border-bottom:1px solid #0f0f0f; font-size:13px; }
+.data-table tbody tr:last-child td { border-bottom:none; }
+.data-table tbody tr:hover { background:#0d0d0d; }
+
+/* ── Icon button ── */
+.icon-btn { width:28px; height:28px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; background:transparent; border:1px solid transparent; cursor:pointer; transition:all .15s; color:#52525b; }
+.icon-btn:hover { background:#141414; border-color:#27272a; color:#e4e4e7; }
+
+/* ── Badges ── */
+.badge { display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:20px; font-size:11px; font-weight:500; border:1px solid; white-space:nowrap; }
+.badge::before { content:''; width:5px; height:5px; border-radius:50%; background:currentColor; }
+.badge-sky     { color:#7dd3fc; border-color:#0c4a6e; background:#082f49; }
+.badge-amber   { color:#fcd34d; border-color:#78350f; background:#451a03; }
+.badge-violet  { color:#c4b5fd; border-color:#4c1d95; background:#2e1065; }
+.badge-emerald { color:#6ee7b7; border-color:#065f46; background:#022c22; }
+.badge-red     { color:#fca5a5; border-color:#7f1d1d; background:#450a0a; }
+.badge-fuchsia { color:#f0abfc; border-color:#701a75; background:#4a044e; }
+.badge-zinc    { color:#a1a1aa; border-color:#3f3f46; background:#18181b; }
+
+/* ── Filter tabs ── */
+.filter-tab { padding:6px 14px; border-radius:6px; font-size:12px; font-weight:500; color:#52525b; background:transparent; border:1px solid transparent; cursor:pointer; transition:all .15s; }
+.filter-tab:hover { color:#a1a1aa; background:#0f0f0f; }
+.filter-tab.active { color:#e4e4e7; background:#141414; border-color:#27272a; }
+
+/* ── Modal ── */
+.modal-bg { backdrop-filter:blur(8px); background:rgba(9,9,9,.85); }
+.modal-box { background:#0f0f0f; border:1px solid #1c1c1e; border-radius:14px; width:100%; box-shadow:0 24px 80px rgba(0,0,0,.8); }
+label.lbl { display:block; font-size:11px; color:#52525b; font-weight:500; margin-bottom:6px; text-transform:uppercase; letter-spacing:.04em; }
+
+/* ── Cancel inline button ── */
+.cancel-btn { padding:4px 10px; border-radius:6px; font-size:11px; font-weight:500; background:transparent; border:1px solid #78350f; color:#fbbf24; cursor:pointer; transition:all .15s; }
+.cancel-btn:hover { background:#451a03; }
+
+::-webkit-scrollbar { width:4px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:#27272a; border-radius:4px; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-220px); }
+  .sidebar.open { transform: translateX(0); box-shadow: 4px 0 24px rgba(0,0,0,.6); }
+  .sidebar-overlay.active { display:block; }
+  .main-content { margin-left:0 !important; padding:18px 16px; }
+  .top-bar { display:flex; }
+}
+@media (max-width: 480px) {
+  .main-content { padding:12px; }
+}

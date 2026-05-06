@@ -13,10 +13,11 @@ async function cargarVuelos(estado = "") {
     vuelosData = await VuelosAPI.listar(estado);
     renderTabla(vuelosData);
   } catch (e) {
-    tbody.innerHTML = `<tr><td colspan="9" class="px-6 py-10 text-center text-red-400">⚠️ No se pudo conectar con la API. ¿Está corriendo Flask?</td></tr>`;
-    document.getElementById("api-status").innerHTML =
-      `<span class="w-2 h-2 bg-red-400 rounded-full animate-pulse"></span> API desconectada`;
-    document.getElementById("api-status").className = "flex items-center gap-2 text-xs text-red-400";
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:#f87171;padding:48px 0;">No se pudo conectar con la API. ¿Está corriendo Flask?</td></tr>`;
+    const dot  = document.getElementById('status-dot');
+    const text = document.getElementById('status-text');
+    if (dot)  dot.style.background  = '#ef4444';
+    if (text) { text.textContent = 'API desconectada'; text.style.color = '#f87171'; }
   }
 }
 
@@ -65,11 +66,8 @@ function renderTabla(vuelos) {
 // ── Filtros ───────────────────────────────────────────────────
 function filtrarEstado(estado) {
   estadoActual = estado;
-  document.querySelectorAll(".filtro-btn").forEach(btn => {
-    const isActive = btn.dataset.estado === estado;
-    btn.className = isActive
-      ? "filtro-btn px-4 py-2 rounded-xl text-sm font-medium bg-sky-500/20 text-sky-300 border border-sky-500/30 hover:bg-sky-500/30 transition-all"
-      : "filtro-btn px-4 py-2 rounded-xl text-sm font-medium bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700 transition-all";
+  document.querySelectorAll(".filter-tab").forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.estado === estado);
   });
   cargarVuelos(estado);
 }
@@ -172,14 +170,13 @@ async function eliminarVuelo(id, numero) {
 
 // ── Inicializar ───────────────────────────────────────────────
 async function init() {
-  // Verificar API
   try {
     await fetch("http://localhost:5000/api/health");
-    document.getElementById("api-status").innerHTML =
-      `<span class="w-2 h-2 bg-emerald-400 rounded-full"></span> API conectada`;
-    document.getElementById("api-status").className = "flex items-center gap-2 text-xs text-emerald-400";
+    const dot  = document.getElementById('status-dot');
+    const text = document.getElementById('status-text');
+    if (dot)  dot.style.background  = '#22c55e';
+    if (text) { text.textContent = 'API conectada'; text.style.color = '#4ade80'; }
   } catch {}
-
   cargarVuelos();
 }
 
