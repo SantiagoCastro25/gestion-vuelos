@@ -186,7 +186,7 @@ async function eliminarReserva(id) {
 
 // ── Inicialización ────────────────────────────────────────────
 async function init() {
-  await Promise.all([cargarVuelosSelect(), cargarPasajerosSelect()]);
+  await poblarSelects();
   cargarReservas();
 }
 
