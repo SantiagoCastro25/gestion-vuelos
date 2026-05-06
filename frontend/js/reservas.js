@@ -4,54 +4,50 @@
 
 let vueloActualFiltro = "";
 
-// ── Cargar reservas ────────────────────────────────────────────
-async function cargarReservas(vueloId = "") {
+// ── Cargar Reservas ─────────────────────────────────────────────
+async function cargarReservas() {
   const tbody = document.getElementById("tabla-reservas");
   try {
-    const reservas = await ReservasAPI.listar(vueloId);
-    renderTabla(reservas);
+    const vueloId = document.getElementById("filtro-vuelo").value;
+    reservasData = await ReservasAPI.listar(vueloId);
+    renderTabla(reservasData);
   } catch (e) {
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:#f87171;padding:48px 0;">No se pudo conectar con la API</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:#e11d48;padding:48px 0;">Error al conectar con la API</td></tr>`;
   }
 }
 
 function renderTabla(reservas) {
   const tbody  = document.getElementById("tabla-reservas");
   const footer = document.getElementById("tabla-footer");
-  footer.textContent = `${reservas.length} reserva${reservas.length !== 1 ? "s" : ""} encontrada${reservas.length !== 1 ? "s" : ""}`;
+  footer.textContent = `Mostrando ${reservas.length} reserva${reservas.length !== 1 ? "s" : ""}`;
 
   if (!reservas.length) {
-    tbody.innerHTML = `<tr><td colspan="9" class="px-6 py-12 text-center text-slate-500">No hay reservas con ese filtro</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" class="px-6 py-12 text-center text-zinc-500">No hay reservas registradas</td></tr>`;
     return;
   }
 
-  const claseIcon = { economica: "✈", ejecutiva: "💼", primera: "👑" };
-
   tbody.innerHTML = reservas.map(r => `
-    <tr class="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
-      <td class="px-6 py-4"><span class="text-slate-400 font-mono text-xs">#${String(r.id).padStart(4,"0")}</span></td>
-      <td class="px-6 py-4"><span class="font-bold text-sky-400">${r.numero_vuelo || "—"}</span></td>
+    <tr class="border-b border-zinc-100 hover:bg-zinc-50">
+      <td class="px-6 py-4"><span class="text-zinc-400 text-xs font-mono">#${r.id}</span></td>
+      <td class="px-6 py-4"><span class="font-semibold text-blue-600 text-sm">${r.numero_vuelo}</span></td>
       <td class="px-6 py-4">
-        <p class="text-slate-200 text-xs">${(r.origen || "").split("(")[0].trim()}</p>
-        <p class="text-slate-500 text-xs">→ ${(r.destino || "").split("(")[0].trim()}</p>
-        <p class="text-slate-600 text-xs mt-0.5">${formatDate(r.fecha_salida)}</p>
+        <p class="text-zinc-800 text-xs font-medium">${r.origen}</p>
+        <p class="text-zinc-500 text-xs">→ ${r.destino}</p>
       </td>
-      <td class="px-6 py-4 text-slate-200 text-sm">${r.pasajero || "—"}</td>
       <td class="px-6 py-4">
-        <span class="font-mono text-sky-300 text-sm font-semibold">${r.asiento || "—"}</span>
+        <p class="text-zinc-800 text-sm font-medium">${r.pasajero_nombre} ${r.pasajero_apellido}</p>
+        <p class="text-zinc-500 text-xs">${r.pasajero_doc}</p>
       </td>
-      <td class="px-6 py-4 text-slate-400 text-sm">${claseIcon[r.clase] || ""} ${r.clase?.charAt(0).toUpperCase() + r.clase?.slice(1) || "—"}</td>
-      <td class="px-6 py-4 text-slate-300 text-sm font-medium">${formatPrice(r.precio)}</td>
+      <td class="px-6 py-4 font-mono text-zinc-600 text-sm">${r.asiento || "—"}</td>
+      <td class="px-6 py-4 text-zinc-600 text-sm capitalize">${r.clase}</td>
+      <td class="px-6 py-4 text-zinc-800 font-medium text-sm">${formatearPrecio(r.precio)}</td>
       <td class="px-6 py-4">${badge(r.estado)}</td>
       <td class="px-6 py-4 text-right">
         <div class="flex items-center justify-end gap-2">
-          ${r.estado !== "cancelada" ? `
-            <button onclick="cancelarReserva(${r.id})"
-              class="px-3 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/30 text-amber-300 text-xs font-medium transition-all" title="Cancelar">
-              ✕ Cancelar
-            </button>` : ""}
+          ${r.estado !== 'cancelada' ? `<button onclick="confirmarCancelar(${r.id})"
+            class="p-1.5 rounded-lg bg-zinc-100 hover:bg-amber-100 text-zinc-500 hover:text-amber-600 transition-all text-sm" title="Cancelar Reserva">🚫</button>` : ''}
           <button onclick="confirmarEliminar(${r.id})"
-            class="p-1.5 rounded-lg bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-all" title="Eliminar">🗑️</button>
+            class="p-1.5 rounded-lg bg-zinc-100 hover:bg-rose-100 text-zinc-500 hover:text-rose-600 transition-all text-sm" title="Eliminar del Sistema">🗑️</button>
         </div>
       </td>
     </tr>`).join("");
@@ -188,20 +184,10 @@ async function eliminarReserva(id) {
   }
 }
 
-// ── Init ──────────────────────────────────────────────────────
+// ── Inicialización ────────────────────────────────────────────
 async function init() {
-  try {
-    await fetch("http://localhost:5000/api/health");
-    const dot  = document.getElementById('status-dot');
-    const text = document.getElementById('status-text');
-    if (dot)  dot.style.background  = '#22c55e';
-    if (text) { text.textContent = 'API conectada'; text.style.color = '#4ade80'; }
-  } catch {}
-
-  await Promise.all([
-    poblarSelects(),
-    cargarReservas(),
-  ]);
+  await Promise.all([cargarVuelosSelect(), cargarPasajerosSelect()]);
+  cargarReservas();
 }
 
 init();

@@ -82,9 +82,9 @@ function showToast(msg, type = "success") {
     position:fixed;bottom:24px;right:24px;z-index:9999;
     display:flex;align-items:center;gap:12px;
     padding:12px 18px;border-radius:10px;
-    background:#111111;border:1px solid #1c1c1e;
-    box-shadow:0 16px 48px rgba(0,0,0,.6);
-    font-size:13px;color:#e4e4e7;font-family:'Inter',sans-serif;
+    background:#ffffff;border:1px solid #e4e4e7;
+    box-shadow:0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.1);
+    font-size:13px;color:#18181b;font-family:'Inter',sans-serif;
     animation:fadeUp .3s ease both;
   `;
   container.innerHTML = `

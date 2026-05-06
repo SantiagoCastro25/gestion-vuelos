@@ -1,6 +1,9 @@
 <?php
 require_once __DIR__ . '/config.php';
 
+// Actualizar estados basados en la hora antes de procesar cualquier petición
+try { actualizarEstadosDinamicos(); } catch (Exception $e) {}
+
 // ── CORS ──────────────────────────────────────────────────────
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');

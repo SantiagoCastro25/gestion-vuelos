@@ -12,48 +12,36 @@ async function cargarPasajeros(busqueda = "") {
     const pasajeros = await PasajerosAPI.listar(encodeURIComponent(busqueda));
     renderTabla(pasajeros);
   } catch (e) {
-    tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-10 text-center text-red-400">⚠️ No se pudo conectar con la API</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#e11d48;padding:48px 0;">Error al conectar con la API</td></tr>`;
   }
 }
 
 function renderTabla(pasajeros) {
   const tbody  = document.getElementById("tabla-pasajeros");
   const footer = document.getElementById("tabla-footer");
-  footer.textContent = `${pasajeros.length} pasajero${pasajeros.length !== 1 ? "s" : ""} encontrado${pasajeros.length !== 1 ? "s" : ""}`;
+  footer.textContent = `Mostrando ${pasajeros.length} pasajero${pasajeros.length !== 1 ? "s" : ""}`;
 
   if (!pasajeros.length) {
-    tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-12 text-center text-slate-500">No se encontraron pasajeros</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-12 text-center text-zinc-500">No se encontraron pasajeros</td></tr>`;
     return;
   }
 
-  const tiposDoc = { cedula: "🪪 Cédula", pasaporte: "📘 Pasaporte", tarjeta_id: "🃏 Tarjeta ID" };
-
   tbody.innerHTML = pasajeros.map(p => `
-    <tr class="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
-      <td class="px-6 py-4">
-        <div class="flex items-center gap-3">
-          <div class="w-9 h-9 bg-sky-500/20 border border-sky-500/30 rounded-full flex items-center justify-center text-sky-300 font-bold text-sm">
-            ${p.nombre[0]}${p.apellido[0]}
-          </div>
-          <div>
-            <p class="text-white font-medium">${p.nombre} ${p.apellido}</p>
-            <p class="text-slate-500 text-xs">ID #${p.id}</p>
-          </div>
-        </div>
+    <tr class="border-b border-zinc-100 hover:bg-zinc-50">
+      <td class="px-6 py-4"><span class="font-semibold text-zinc-800">${p.nombre} ${p.apellido}</span></td>
+      <td class="px-6 py-4 text-zinc-600 text-sm">
+        <span class="uppercase text-xs text-zinc-400 mr-1">${p.tipo_documento.substring(0,3)}</span>
+        ${p.numero_documento}
       </td>
-      <td class="px-6 py-4">
-        <p class="text-slate-300 text-sm">${p.documento}</p>
-        <p class="text-slate-500 text-xs">${tiposDoc[p.tipo_documento] || p.tipo_documento}</p>
-      </td>
-      <td class="px-6 py-4 text-slate-300 text-sm">${p.email}</td>
-      <td class="px-6 py-4 text-slate-400 text-sm">${p.telefono || "—"}</td>
-      <td class="px-6 py-4 text-slate-400 text-sm">🌍 ${p.nacionalidad}</td>
+      <td class="px-6 py-4 text-zinc-500 text-sm">${p.email}</td>
+      <td class="px-6 py-4 text-zinc-500 text-sm">${p.telefono || "—"}</td>
+      <td class="px-6 py-4 text-zinc-500 text-sm">${p.nacionalidad || "—"}</td>
       <td class="px-6 py-4 text-right">
         <div class="flex items-center justify-end gap-2">
           <button onclick="editarPasajero(${p.id})"
-            class="p-1.5 rounded-lg bg-slate-800 hover:bg-sky-500/20 text-slate-400 hover:text-sky-400 transition-all" title="Editar">✏️</button>
-          <button onclick="confirmarEliminar(${p.id}, '${p.nombre} ${p.apellido}')"
-            class="p-1.5 rounded-lg bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-all" title="Eliminar">🗑️</button>
+            class="p-1.5 rounded-lg bg-zinc-100 hover:bg-blue-100 text-zinc-500 hover:text-blue-600 transition-all text-sm" title="Editar">✏️</button>
+          <button onclick="confirmarEliminar(${p.id}, '${p.nombre}')"
+            class="p-1.5 rounded-lg bg-zinc-100 hover:bg-rose-100 text-zinc-500 hover:text-rose-600 transition-all text-sm" title="Eliminar">🗑️</button>
         </div>
       </td>
     </tr>`).join("");
@@ -69,6 +57,7 @@ function buscarPasajero(valor) {
 function abrirModal(p = null) {
   editandoId = p ? p.id : null;
   document.getElementById("modal-title").textContent = p ? "Editar Pasajero" : "Nuevo Pasajero";
+  document.getElementById("modal-title").style.color = p ? "#2563eb" : "#18181b";
   document.getElementById("pasajero-id").value   = p?.id || "";
   document.getElementById("f-nombre").value      = p?.nombre || "";
   document.getElementById("f-apellido").value    = p?.apellido || "";
