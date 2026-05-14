@@ -1,107 +1,70 @@
-# AeroGest — Sistema de Gestión de Vuelos
+# SkyAI — Plataforma Global de Vuelos con Inteligencia Artificial
 
-Plataforma web para gestionar vuelos, pasajeros y reservas de un aeropuerto, con diseño moderno y minimalista, adaptada para ser 100% responsiva.
+¡Bienvenido a SkyAI! Esta es una plataforma web moderna para buscar vuelos, hoteles y predecir los mejores precios de viaje usando Inteligencia Artificial.
 
----
+## ⚠️ Adiós a XAMPP: Nueva Arquitectura
 
-## Tecnologías
+El proyecto anterior basado en PHP y MySQL ha sido **completamente reemplazado**. 
 
-| Capa | Tecnología |
-|---|---|
-| Backend | PHP |
-| Base de Datos | MySQL (XAMPP) |
-| Frontend | HTML + Tailwind CSS (CDN) + JavaScript puro |
-| Comunicación | API REST (JSON) |
+**¿Sigo necesitando XAMPP?**
+**¡NO! Ya no necesitas XAMPP, ni Apache, ni MySQL.** 
 
----
+El proyecto ahora está construido con **Next.js**, una tecnología moderna basada en Node.js que incluye tanto el servidor (Backend) como la interfaz web (Frontend) en un solo lugar. 
 
-## Instalación rápida (XAMPP)
-
-1. Abre **XAMPP Control Panel** e inicia **Apache** y **MySQL**.
-2. Clona o copia este proyecto dentro de la carpeta `htdocs` de XAMPP. (Por ejemplo: `C:\xampp\htdocs\FlightsManagement`).
-3. Ve a `http://localhost/phpmyadmin` en tu navegador.
-4. Clic en **SQL** → pega todo el contenido de `database/schema.sql` → **Ejecutar**. Esto creará la base de datos `flights_management` y algunas tablas iniciales.
-5. Si tu MySQL tiene contraseña, asegúrate de modificar `api/config.php` y poner tu contraseña. Por defecto viene vacío.
-6. Abre la aplicación en tu navegador accediendo a: `http://localhost/FlightsManagement/frontend/index.html`.
-
-> Nota: El frontend detecta la ruta automáticamente (usando la ubicación actual del navegador) para conectarse con la API en `api/`. Por eso funcionará sin modificar puertos ni variables en JavaScript, incluso en otros dispositivos conectados a tu misma red Wi-Fi si entran a tu IP.
+**Tampoco necesitas simplemente abrir un `.html`**. Las aplicaciones modernas de React/Next.js necesitan compilarse y servirse a través de su propio servidor de desarrollo integrado. Sigue las instrucciones a continuación para arrancar la aplicación correctamente.
 
 ---
 
-## Estructura del Proyecto
+## 🚀 Cómo ejecutar SkyAI
 
-```
-FlightsManagement/
-│
-├── database/
-│   └── schema.sql           ← Script SQL (crea tablas + datos de ejemplo)
-│
-├── api/                     ← Backend PHP
-│   ├── .htaccess            ← Reescritura de URLs para API REST
-│   ├── config.php           ← Configuración BD y utilidades comunes
-│   ├── index.php            ← Router principal (recibe todo)
-│   ├── vuelos.php           ← Controladores de Vuelos
-│   ├── pasajeros.php        ← Controladores de Pasajeros
-│   └── reservas.php         ← Controladores de Reservas
-│
-└── frontend/                ← Interfaz de Usuario
-    ├── index.html           ← Dashboard general
-    ├── vuelos.html          ← Gestión de vuelos
-    ├── pasajeros.html       ← Gestión de pasajeros
-    ├── reservas.html        ← Gestión de reservas
-    ├── shared.css           ← Estilos compartidos y de responsiveness
-    └── js/
-        ├── api.js           ← Cliente REST centralizado (detecta base_url)
-        ├── vuelos.js        ← Lógica de vuelos
-        ├── pasajeros.js     ← Lógica de pasajeros
-        └── reservas.js      ← Lógica de reservas
-```
+Dado que ya no usamos XAMPP, el proceso para iniciar la aplicación es diferente pero muy sencillo:
+
+### Requisitos Previos
+1. Necesitas tener instalado **Node.js** en tu computadora. Puedes descargarlo e instalarlo desde [nodejs.org](https://nodejs.org/).
+2. Asegúrate de tener una terminal abierta (como PowerShell o la terminal integrada de VS Code).
+
+### Pasos para iniciar
+
+1. **Abre tu terminal** y navega a la nueva carpeta del proyecto llamada `skyai`:
+   ```bash
+   cd skyai
+   ```
+
+2. **Inicia el servidor de desarrollo** ejecutando el siguiente comando:
+   ```bash
+   npm run dev
+   ```
+
+3. **Abre tu navegador web** y dirígete a:
+   👉 **[http://localhost:3000](http://localhost:3000)**
+
+¡Eso es todo! La plataforma SkyAI se cargará en tu navegador. 
+
+> *Nota: Si ves un error de permisos al ejecutar comandos en PowerShell, puedes solucionarlo temporalmente abriendo PowerShell como Administrador y ejecutando: `Set-ExecutionPolicy RemoteSigned`.*
 
 ---
 
-## Endpoints de la API
+## ⚙️ Configuración de APIs (Opcional)
 
-### Vuelos (`/api/vuelos`)
-| Método | URL | Descripción |
-|---|---|---|
-| GET | `/api/vuelos/` | Listar todos los vuelos |
-| GET | `/api/vuelos/?estado=programado` | Filtrar por estado |
-| GET | `/api/vuelos/<id>` | Obtener un vuelo |
-| POST | `/api/vuelos/` | Crear vuelo |
-| PUT | `/api/vuelos/<id>` | Actualizar vuelo |
-| DELETE | `/api/vuelos/<id>` | Eliminar vuelo |
-| GET | `/api/vuelos/estadisticas` | Conteos por estado |
+Actualmente, la aplicación está configurada con **Datos de Prueba (Mock Data)**. Esto significa que **puedes probar todas las pantallas, el chatbot y ver los resultados sin necesidad de configurar nada más**.
 
-### Pasajeros (`/api/pasajeros`)
-| Método | URL | Descripción |
-|---|---|---|
-| GET | `/api/pasajeros/` | Listar pasajeros |
-| GET | `/api/pasajeros/?q=nombre` | Buscar pasajero |
-| POST | `/api/pasajeros/` | Registrar pasajero |
-| PUT | `/api/pasajeros/<id>` | Actualizar datos |
-| DELETE | `/api/pasajeros/<id>` | Eliminar pasajero |
+Sin embargo, si quieres conectarlo a datos reales del mundo real, necesitarás añadir tus propias "API Keys". Puedes hacerlo editando el archivo `.env.local` ubicado en la carpeta `/skyai`:
 
-### Reservas (`/api/reservas`)
-| Método | URL | Descripción |
-|---|---|---|
-| GET | `/api/reservas/` | Listar reservas |
-| GET | `/api/reservas/?vuelo_id=1` | Filtrar por vuelo |
-| POST | `/api/reservas/` | Crear reserva |
-| PUT | `/api/reservas/<id>/cancelar` | Cancelar reserva |
-| DELETE | `/api/reservas/<id>` | Eliminar reserva |
-| GET | `/api/reservas/resumen` | Estadísticas |
+1. **Búsqueda de Vuelos y Hoteles reales:** Regístrate en [RapidAPI](https://rapidapi.com), busca la API "Sky Scrapper" y obtén una llave gratuita.
+2. **Chatbot y Predicción con IA real:** Necesitas una clave de [OpenAI](https://platform.openai.com/api-keys).
+3. **Inicio de sesión real con Google:** Configura un proyecto en Google Cloud Console para usar OAuth 2.0.
+
+> *Dentro del archivo `skyai/.env.local` encontrarás instrucciones más detalladas sobre cómo obtener cada clave si decides usarlas.*
 
 ---
 
-## Problemas comunes
+## 🏗️ Estructura del Proyecto (`/skyai`)
 
-**El frontend no carga datos o dice Sin Conexión:**
-→ Asegúrate de haber iniciado **Apache** y **MySQL** en XAMPP.
-→ Asegúrate de abrir el proyecto a través del servidor local (`localhost`), no dándole doble click al archivo HTML (`file://`).
+- **`/app`**: Contiene todas las páginas de la aplicación (Inicio, Resultados, Login, Hoteles, etc.) y las rutas de la API (Backend).
+- **`/components`**: Contiene los bloques de construcción visuales de la aplicación.
+  - `/ai`: Componentes de Inteligencia Artificial (Chatbot y Predicción de precios).
+  - `/search`: El formulario de búsqueda inteligente.
+  - `/results`: Las tarjetas de vuelos y hoteles.
+  - `/layout`: La barra de navegación.
 
-**Error de conexión a MySQL:**
-→ XAMPP MySQL debe estar en verde (**Running**).
-→ Revisa `api/config.php` y ajusta `DB_PASS` si tu MySQL de XAMPP tiene una contraseña configurada.
-
-**`flights_management` no existe:**
-→ Asegúrate de haber ejecutado todo el código de `database/schema.sql` en phpMyAdmin.
+¡Disfruta construyendo el futuro de los viajes con SkyAI! 🛫🤖
